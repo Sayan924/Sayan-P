@@ -245,6 +245,10 @@
     const n = document.createElement('div');
     n.className = 'name';
     n.textContent = 'Gulu ❤️';
+    n.style.left = Math.random() * 100 + 'vw';
+    nameLayer.appendChild(n);
+    setTimeout(() => n.remove(), 5000);
+  }
     n.textContent = 'Bidisha ❤️';
     n.style.left = Math.random() * 100 + 'vw';
     nameLayer.appendChild(n);
