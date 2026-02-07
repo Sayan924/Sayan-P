@@ -29,9 +29,23 @@
       text-align: center;
       padding: 20px;
       box-sizing: border-box;
+      position: relative;
     }
 
-    /* 🌈 Rainbow Animation */
+    /* ✨ Twinkling Stars Background */
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: twinkle var(--duration) infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
     .rainbow-text { animation: colorCycle 3s infinite linear; }
     @keyframes colorCycle {
       0% { color: #00ff00; } 25% { color: #ffff00; }
@@ -39,7 +53,6 @@
       100% { color: #00ff00; }
     }
 
-    /* 📸 Photo Styles */
     .photo-frame {
       width: 130px;
       height: 130px;
@@ -78,6 +91,7 @@
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      z-index: 11;
     }
 
     #yes { 
@@ -92,9 +106,8 @@
       100% { transform: scale(1); }
     }
 
-    #no { background: #666; color: white; }
+    #no { background: #666; color: white; position: relative; }
 
-    /* 🎁 Floating Decorations */
     .item {
       position: absolute;
       font-size: 40px;
@@ -111,7 +124,6 @@
       50% { transform: translateY(-20px) rotate(10deg); }
     }
 
-    /* PAGE 2 Glassmorphism */
     #page2 { display: none; }
     
     #secret {
@@ -123,14 +135,13 @@
       backdrop-filter: blur(15px);
       border: 1px solid rgba(255,255,255,0.3);
       line-height: 1.6;
+      min-height: 150px;
     }
 
-    #timer {
-      font-size: 14px;
-      margin-bottom: 20px;
-      background: rgba(0,0,0,0.1);
-      padding: 10px;
-      border-radius: 10px;
+    #typewriter {
+      font-style: italic;
+      font-family: 'Dancing Script', cursive;
+      font-size: 20px;
     }
 
     #waBtn {
@@ -139,7 +150,7 @@
       padding: 12px 25px;
       border-radius: 50px;
       text-decoration: none;
-      display: inline-block;
+      display: none; /* Hidden until typing is done */
       margin-top: 20px;
       font-weight: bold;
       transition: 0.3s;
@@ -158,6 +169,8 @@
 </head>
 
 <body>
+
+<div id="star-container"></div>
 
 <div class="valentine-items" id="decorations">
   <div class="item teddy">🧸</div>
@@ -182,17 +195,10 @@
   <h1>I Love You Forever! 💘</h1>
   <p class="subtext">Love from Sayan</p>
   
-  <div id="timer">Loading our love time...</div>
-
   <button id="surpriseBtn" style="background: white; color: #ff2f6d; border-radius: 50px;">Click for a Surprise</button>
 
   <div id="secret">
-    <p>💌 <i>"If love be sin, then gladly am I lost;<br>
-    If truth be sworn, let this my vow remain:<br>
-    Whilst breath still warms this ever-faithful chest,<br>
-    My heart is thine, and thine alone, amen."</i> 💌</p>
-    <p>See you soon, Gulu ✨</p>
-
+    <div id="typewriter"></div>
     <a id="waBtn" href="https://wa.me/918436312171?text=Yes!%20I%20will%20be%20your%20Valentine!%20❤️✨" target="_blank">
       Reply on WhatsApp 📱
     </a>
@@ -212,20 +218,42 @@
   const decorations = document.getElementById('decorations');
   const surpriseBtn = document.getElementById('surpriseBtn');
   const secret = document.getElementById('secret');
-  const heartsLayer = document.querySelector('.hearts-layer');
-  const nameLayer = document.querySelector('.name-layer');
-  const timerElement = document.getElementById('timer');
+  const typewriterElement = document.getElementById('typewriter');
+  const waBtn = document.getElementById('waBtn');
+  const starContainer = document.getElementById('star-container');
 
-  // CHANGE THIS DATE to the day you met or started dating
-  const startDate = new Date("2023-01-01"); 
+  /* 🌟 OPTION 3: Generate Twinkling Stars */
+  function createStars() {
+    for (let i = 0; i < 50; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 4 + 'px';
+      star.style.width = size;
+      star.style.height = size;
+      star.style.top = Math.random() * 100 + 'vh';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+      starContainer.appendChild(star);
+    }
+  }
+  createStars();
 
-  function updateTimer() {
-    const now = new Date();
-    const diff = now - startDate;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    timerElement.innerHTML = `We've been together for <b>${days}</b> beautiful days!`;
+  /* ✍️ OPTION 4: Typewriter Effect */
+  const message = "💌 If love be sin, then gladly am I lost; If truth be sworn, let this my vow remain: Whilst breath still warms this ever-faithful chest, My heart is thine, and thine alone, amen. See you soon, Gulu ✨";
+  
+  function typeWriter(text, i, fnCallback) {
+    if (i < text.length) {
+      typewriterElement.innerHTML = text.substring(0, i+1) + '<span aria-hidden="true">|</span>';
+      setTimeout(function() {
+        typeWriter(text, i + 1, fnCallback)
+      }, 50);
+    } else if (typeof fnCallback == 'function') {
+      typewriterElement.innerHTML = text; // Remove cursor
+      setTimeout(fnCallback, 700);
+    }
   }
 
+  /* Core Logic */
   let yesScale = 1;
   function moveNo() {
     noBtn.style.position = 'fixed';
@@ -244,22 +272,10 @@
     h.textContent = ['❤️','💖','✨','🌸'][Math.floor(Math.random()*4)];
     h.style.left = Math.random() * 100 + 'vw';
     h.style.fontSize = (Math.random() * 20 + 20) + 'px';
-    heartsLayer.appendChild(h);
+    document.querySelector('.hearts-layer').appendChild(h);
     setTimeout(() => h.remove(), 5000);
   }
   setInterval(spawnHeart, 400);
-
-  function spawnName() {
-    const n = document.createElement('div');
-    n.className = 'name';
-    n.textContent = 'Gulu ❤️';
-    n.style.left = Math.random() * 100 + 'vw';
-    n.style.color = 'white';
-    n.style.fontSize = '20px';
-    n.style.fontWeight = 'bold';
-    nameLayer.appendChild(n);
-    setTimeout(() => n.remove(), 5000);
-  }
 
   yesBtn.onclick = () => {
     confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
@@ -267,14 +283,17 @@
     decorations.style.display = 'none';
     document.body.style.background = 'linear-gradient(180deg, #ff4d4d, #ff9eb8)';
     page2.style.display = 'block';
-    updateTimer();
-    setInterval(spawnName, 700);
   };
 
   surpriseBtn.onclick = () => {
-    secret.style.display = 'block';
     surpriseBtn.style.display = 'none';
+    secret.style.display = 'block';
     confetti({ particleCount: 150, spread: 70 });
+    
+    // Start the typewriter effect
+    typeWriter(message, 0, function(){
+      waBtn.style.display = 'inline-block'; // Show WA button after typing
+    });
   };
 </script>
 
